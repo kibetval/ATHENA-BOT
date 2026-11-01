@@ -1,28 +1,40 @@
 import os
 import time
 import pandas as pd
-import numpy as np
 from binance.client import Client
 from binance.exceptions import BinanceAPIException
 
-# --- Fetch API Credentials from System Environment ---
+# --- Credentials Setup ---
 API_KEY = os.getenv("BINANCE_API_KEY")
 API_SECRET = os.getenv("BINANCE_API_SECRET")
 
-# Initialize Binance Client for Testnet Demo Mode
+# Initialize Binance Client for Testnet Demo
 client = Client(API_KEY, API_SECRET, testnet=True)
 
-# Parameter Settings
+# --- Parameters ---
 SYMBOL = "BTCUSDT"
-QUANTITY = 0.001  # Fixed order quantity
+QUANTITY = 0.001          # Amount of BTC per order
 TIMEFRAME = Client.KLINE_INTERVAL_1MINUTE
-CHECK_INTERVAL_SECONDS = 60
+CHECK_INTERVAL = 60       # Check every 60 seconds
 
 in_position = False
 
-def get_market_data(symbol, interval, limit=50):
-    """Retrieve historical candle data from Binance"""
-    klines = client.get_klines(symbol=symbol, interval=interval, limit=limit)
+def check_balance():
+    """Safely checks and prints demo account balance."""
+    try:
+        account = client.get_account()
+        print("\n💰 --- DEMO WALLET BALANCES ---")
+        for asset in account.get('balances', []):
+            free = float(asset['free'])
+            if free > 0:
+                print(f"   {asset['asset']}: {free}")
+        print("-------------------------------\n")
+    except Exception as e:
+        print(f"⚠️ Balance check warning: {e}")
+
+def get_data():
+    """Fetches candlestick data from Binance."""
+    klines = client.get_klines(symbol=SYMBOL, interval=TIMEFRAME, limit=50)
     df = pd.DataFrame(klines, columns=[
         'timestamp', 'open', 'high', 'low', 'close', 'volume',
         'close_time', 'quote_asset_volume', 'number_of_trades',
@@ -31,76 +43,60 @@ def get_market_data(symbol, interval, limit=50):
     df['close'] = df['close'].astype(float)
     return df
 
-def calculate_rsi(series, period=14):
-    """Compute Relative Strength Index (RSI)"""
-    delta = series.diff()
-    gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
-    rs = gain / loss
-    return 100 - (100 / (1 + rs))
-
-def evaluate_signals(df):
-    """Compute Indicators and Check Entry/Exit Rules"""
-    df['ema_fast'] = df['close'].ewm(span=9, adjust=False).mean()
-    df['ema_slow'] = df['close'].ewm(span=21, adjust=False).mean()
-    df['rsi'] = calculate_rsi(df['close'], period=14)
-
-    latest = df.iloc[-1]
-    previous = df.iloc[-2]
-
-    fast_crossed_above = (previous['ema_fast'] <= previous['ema_slow']) and (latest['ema_fast'] > latest['ema_slow'])
-    fast_crossed_below = (previous['ema_fast'] >= previous['ema_slow']) and (latest['ema_fast'] < latest['ema_slow'])
-
-    rsi_val = latest['rsi']
-    price = latest['close']
-
-    print(f"[{time.strftime('%H:%M:%S')}] {SYMBOL} | Price: ${price:.2f} | EMA9: ${latest['ema_fast']:.2f} | EMA21: ${latest['ema_slow']:.2f} | RSI: {rsi_val:.2f}")
-
-    if fast_crossed_above and rsi_val < 55:
-        return "BUY"
-    elif fast_crossed_below or rsi_val > 70:
-        return "SELL"
-    
-    return "HOLD"
-
-def run_trading_cycle():
+def run_strategy():
     global in_position
     try:
-        df = get_market_data(SYMBOL, TIMEFRAME)
-        signal = evaluate_signals(df)
+        df = get_data()
+        
+        # Simple moving average and indicator logic
+        df['ema_fast'] = df['close'].ewm(span=9, adjust=False).mean()
+        df['ema_slow'] = df['close'].ewm(span=21, adjust=False).mean()
+        
+        latest = df.iloc[-1]
+        price = latest['close']
+        fast = latest['ema_fast']
+        slow = latest['ema_slow']
 
-        if signal == "BUY" and not in_position:
-            print(f"🚀 BUY Signal Triggered! Placing Market Buy Order for {QUANTITY} {SYMBOL}...")
+        print(f"[{time.strftime('%H:%M:%S')}] {SYMBOL} Price: ${price:.2f} | EMA9: ${fast:.2f} | EMA21: ${slow:.2f}")
+
+        # Simple crossover rule for testing execution
+        if fast > slow and not in_position:
+            print(f"🚀 Bullish crossover detected! Placing BUY order...")
             order = client.create_order(
                 symbol=SYMBOL,
                 side=Client.SIDE_BUY,
                 type=Client.ORDER_TYPE_MARKET,
                 quantity=QUANTITY
             )
-            print(f"✅ Market BUY Executed! Order ID: {order['orderId']}")
+            print(f"✅ BUY Executed successfully! Order ID: {order['orderId']}")
             in_position = True
+            check_balance()
 
-        elif signal == "SELL" and in_position:
-            print(f"🔻 SELL Signal Triggered! Placing Market Sell Order for {QUANTITY} {SYMBOL}...")
+        elif fast < slow and in_position:
+            print(f"🔻 Bearish crossover detected! Placing SELL order...")
             order = client.create_order(
                 symbol=SYMBOL,
                 side=Client.SIDE_SELL,
                 type=Client.ORDER_TYPE_MARKET,
                 quantity=QUANTITY
             )
-            print(f"✅ Market SELL Executed! Order ID: {order['orderId']}")
+            print(f"✅ SELL Executed successfully! Order ID: {order['orderId']}")
             in_position = False
-
+            check_balance()
         else:
-            print(f"⏳ Signal Status: {signal}. Maintaining position state.")
+            print(f"⏳ Holding position state. No trade triggered.")
 
     except BinanceAPIException as e:
-        print(f"❌ Binance API Error: {e.status_code} - {e.message}")
+        print(f"❌ Binance API Error [{e.status_code}]: {e.message}")
     except Exception as e:
-        print(f"⚠️ Runtime Exception: {str(e)}")
+        print(f"⚠️ Error in execution loop: {str(e)}")
 
 if __name__ == "__main__":
-    print(f"🤖 Starting Athena Automated Trading Engine on Binance Testnet ({SYMBOL})...")
+    print("=" * 50)
+    print("   ATHENA BOT - LIVE TESTNET ENGINE STARTING   ")
+    print("=" * 50)
+    check_balance()
+    
     while True:
-        run_trading_cycle()
-        time.sleep(CHECK_INTERVAL_SECONDS)
+        run_strategy()
+        time.sleep(CHECK_INTERVAL)
