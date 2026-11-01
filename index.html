@@ -9,144 +9,101 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body { background-color: #0b0e14; color: #e1e7ef; font-family: 'Inter', sans-serif; }
-    .glass-panel { background: rgba(18, 24, 38, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .glass-panel { background: rgba(18, 24, 38, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
     .custom-scrollbar::-webkit-scrollbar { width: 4px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #2b3548; border-radius: 4px; }
   </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden">
+<body class="min-h-screen flex flex-col bg-[#0b0e14] text-gray-100 pb-4">
 
   <!-- Header / Navigation -->
-  <header class="h-14 border-b border-gray-800 bg-[#0e131f] flex items-center justify-between px-4 z-20">
+  <header class="h-14 border-b border-gray-800 bg-[#0e131f] flex items-center justify-between px-4 sticky top-0 z-20">
     <div class="flex items-center space-x-3">
       <div class="bg-blue-600 p-2 rounded-lg text-white">
-        <i class="fa-solid fa-chart-line text-lg"></i>
+        <i class="fa-solid fa-chart-line text-base"></i>
       </div>
       <div>
-        <h1 class="font-bold text-lg leading-tight">AlgoTrader <span class="text-xs font-normal text-blue-400 bg-blue-900/40 px-2 py-0.5 rounded">Athena V1.0</span></h1>
-        <p class="text-xs text-gray-400">Trading Command Center</p>
+        <h1 class="font-bold text-sm leading-tight">AlgoTrader <span class="text-[10px] font-normal text-blue-400 bg-blue-900/40 px-1.5 py-0.5 rounded">Athena V1.0</span></h1>
+        <p class="text-[10px] text-gray-400">Command Center</p>
       </div>
     </div>
 
-    <div class="flex items-center space-x-4">
-      <div class="flex items-center space-x-2 bg-gray-800/80 px-3 py-1.5 rounded-lg border border-gray-700 text-xs">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span class="font-medium text-gray-200">Binance Testnet Active</span>
+    <div class="flex items-center space-x-2">
+      <div class="flex items-center space-x-1.5 bg-gray-800/80 px-2 py-1 rounded-lg border border-gray-700 text-[10px]">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="font-medium text-gray-200">Testnet</span>
       </div>
-      <div class="bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-semibold">
-        SUBSCRIPTION ACTIVE
+      <div class="bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 px-2 py-1 rounded-lg text-[10px] font-semibold">
+        ACTIVE
       </div>
     </div>
   </header>
 
-  <!-- Main Grid Layout -->
-  <div class="flex-1 grid grid-cols-12 gap-3 p-3 overflow-hidden">
+  <!-- Main Container -->
+  <div class="flex flex-col p-3 space-y-3 max-w-lg mx-auto w-full">
     
-    <!-- Left Panel: Strategy Console & Interactive Chart -->
-    <main class="col-span-8 flex flex-col space-y-3 h-full overflow-hidden">
-      
-      <!-- Top Bar & Strategy Presets -->
-      <div class="glass-panel p-3 rounded-xl flex flex-col space-y-2">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <h2 class="font-bold text-xl text-white flex items-center gap-2">
-              BTCUSDT <span class="text-xs font-normal bg-gray-800 px-2 py-1 rounded text-gray-300">5m</span>
-            </h2>
-            <span id="current-price" class="text-lg font-mono font-semibold text-emerald-400">$0.00</span>
-          </div>
-          <div class="text-xs text-gray-400">
-            Automated Strategy Engine: <span class="text-blue-400 font-medium">EMA 9/21 + RSI 14</span>
-          </div>
-        </div>
-
-        <!-- Strategy Indicator Tags -->
-        <div class="flex items-center space-x-2 overflow-x-auto custom-scrollbar py-1 text-xs">
-          <button class="bg-blue-600 text-white px-3 py-1 rounded-md font-medium">RSI CROSSOVER</button>
-          <button class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1 rounded-md">EMA CROSSOVER</button>
-          <button class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1 rounded-md">MACD</button>
-          <button class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1 rounded-md">BOLLINGER BANDS</button>
-          <button class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1 rounded-md">VOLUME PROFILE</button>
+    <!-- Strategy Console & Price Card -->
+    <div class="glass-panel p-3 rounded-xl flex flex-col space-y-2">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <h2 class="font-bold text-lg text-white">BTCUSDT</h2>
+          <span class="text-[10px] bg-gray-800 px-1.5 py-0.5 rounded text-gray-300">5m</span>
+          <span id="current-price" class="text-sm font-mono font-semibold text-emerald-400">$0.00</span>
         </div>
       </div>
 
-      <!-- Main Candlestick & RSI Chart Container -->
-      <div class="glass-panel rounded-xl flex-1 flex flex-col p-3 relative overflow-hidden">
-        <div id="chart-candlestick" class="w-full flex-1 min-h-[280px]"></div>
-        <div class="h-px bg-gray-800 my-1"></div>
-        <div id="chart-rsi" class="w-full h-28"></div>
+      <!-- Strategy Indicator Tags -->
+      <div class="flex items-center space-x-1.5 overflow-x-auto custom-scrollbar py-1 text-[11px]">
+        <button class="bg-blue-600 text-white px-2.5 py-1 rounded-md font-medium shrink-0">EMA CROSSOVER</button>
+        <button class="bg-gray-800 text-gray-300 px-2.5 py-1 rounded-md shrink-0">RSI 14</button>
+        <button class="bg-gray-800 text-gray-300 px-2.5 py-1 rounded-md shrink-0">MACD</button>
       </div>
-    </main>
+    </div>
 
-    <!-- Right Panel: Order Flow & Live Bot Execution Ticker -->
-    <aside class="col-span-4 flex flex-col space-y-3 h-full overflow-hidden">
-      
-      <!-- Market Ticker / Watchlist -->
-      <div class="glass-panel rounded-xl p-3 flex flex-col h-1/2 overflow-hidden">
-        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Order Flow & Market Pulse</h3>
-        <div class="flex space-x-2 border-b border-gray-800 pb-2 text-xs">
-          <button class="text-blue-400 border-b-2 border-blue-400 pb-1 font-medium">TRENDING</button>
-          <button class="text-gray-400 hover:text-gray-200">GAINERS</button>
-          <button class="text-gray-400 hover:text-gray-200">LOSERS</button>
+    <!-- Candlestick Chart Panel -->
+    <div class="glass-panel rounded-xl p-3 flex flex-col space-y-2">
+      <div class="text-[11px] text-gray-400 font-medium">Live Candlestick Stream (BTC/USDT)</div>
+      <div id="chart-candlestick" class="w-full h-64 rounded-lg overflow-hidden"></div>
+      <div class="h-px bg-gray-800"></div>
+      <div class="text-[11px] text-gray-400 font-medium">RSI Oscillator (14)</div>
+      <div id="chart-rsi" class="w-full h-24 rounded-lg overflow-hidden"></div>
+    </div>
+
+    <!-- Market Pulse -->
+    <div class="glass-panel rounded-xl p-3 flex flex-col space-y-2">
+      <h3 class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Market Pulse</h3>
+      <div class="flex justify-between items-center p-2 rounded bg-gray-900/60 text-xs">
+        <div>
+          <p class="font-bold text-white">BTCUSDT</p>
+          <p class="text-gray-400 text-[10px]">Price: <span class="text-gray-200" id="ticker-btc">$0.00</span></p>
         </div>
-        
-        <div class="flex-1 overflow-y-auto custom-scrollbar space-y-2 mt-2 pr-1" id="ticker-list">
-          <!-- Live Pair Items -->
-          <div class="flex justify-between items-center p-2 rounded bg-gray-900/50 hover:bg-gray-800/60 transition text-xs">
-            <div>
-              <p class="font-bold text-white">BTCUSDT</p>
-              <p class="text-gray-400 text-[10px]">Price: <span class="text-gray-200" id="ticker-btc">$0.00</span></p>
-            </div>
-            <div class="text-right">
-              <span class="text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded text-[10px] font-semibold">+2.45%</span>
-            </div>
-          </div>
-          <div class="flex justify-between items-center p-2 rounded bg-gray-900/50 hover:bg-gray-800/60 transition text-xs">
-            <div>
-              <p class="font-bold text-white">ETHUSDT</p>
-              <p class="text-gray-400 text-[10px]">Price: $3,120.50</p>
-            </div>
-            <div class="text-right">
-              <span class="text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded text-[10px] font-semibold">+1.82%</span>
-            </div>
-          </div>
-          <div class="flex justify-between items-center p-2 rounded bg-gray-900/50 hover:bg-gray-800/60 transition text-xs">
-            <div>
-              <p class="font-bold text-white">SOLUSDT</p>
-              <p class="text-gray-400 text-[10px]">Price: $185.30</p>
-            </div>
-            <div class="text-right">
-              <span class="text-red-400 bg-red-950/60 px-2 py-0.5 rounded text-[10px] font-semibold">-0.95%</span>
-            </div>
-          </div>
-        </div>
+        <span class="text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded text-[10px] font-semibold">ONLINE</span>
       </div>
+    </div>
 
-      <!-- Execution Terminal Console Logs -->
-      <div class="glass-panel rounded-xl p-3 flex flex-col flex-1 overflow-hidden">
-        <div class="flex justify-between items-center mb-2">
-          <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Athena Execution Log</h3>
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        </div>
-        <div id="terminal-logs" class="flex-1 bg-[#070a0f] p-2.5 rounded-lg border border-gray-800 font-mono text-[11px] overflow-y-auto custom-scrollbar space-y-1 text-gray-300">
-          <p class="text-gray-500">[SYSTEM] Athena Bot initialization complete...</p>
-          <p class="text-blue-400">[CONNECT] WebSocket stream established for BTCUSDT@kline_5m</p>
-          <p class="text-emerald-400">[ENGINE] Strategy module RSI/EMA loaded successfully.</p>
-        </div>
+    <!-- Execution Terminal Console Logs -->
+    <div class="glass-panel rounded-xl p-3 flex flex-col">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Athena Execution Log</h3>
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
       </div>
+      <div id="terminal-logs" class="bg-[#070a0f] p-2.5 rounded-lg border border-gray-800 font-mono text-[10px] h-32 overflow-y-auto custom-scrollbar space-y-1 text-gray-300">
+        <p class="text-gray-500">[SYSTEM] Athena dashboard online...</p>
+        <p class="text-blue-400">[CONNECT] WebSocket live stream active for BTCUSDT</p>
+      </div>
+    </div>
 
-    </aside>
   </div>
 
-  <!-- Real-Time Charting & WebSocket Logic -->
+  <!-- Real-Time Charting & WebSocket Script -->
   <script>
     const chartElement = document.getElementById('chart-candlestick');
     const rsiElement = document.getElementById('chart-rsi');
 
     const chart = LightweightCharts.createChart(chartElement, {
-      layout: { backgroundColor: 'transparent', textColor: '#9ca3af' },
-      grid: { vertLines: { color: 'rgba(255, 255, 255, 0.05)' }, horzLines: { color: 'rgba(255, 255, 255, 0.05)' } },
-      crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+      layout: { background: { type: 'solid', color: '#121826' }, textColor: '#9ca3af' },
+      grid: { vertLines: { color: 'rgba(255, 255, 255, 0.03)' }, horzLines: { color: 'rgba(255, 255, 255, 0.03)' } },
       timeScale: { timeVisible: true, secondsVisible: false }
     });
 
@@ -155,8 +112,8 @@
     });
 
     const rsiChart = LightweightCharts.createChart(rsiElement, {
-      layout: { backgroundColor: 'transparent', textColor: '#9ca3af' },
-      grid: { vertLines: { color: 'rgba(255, 255, 255, 0.05)' }, horzLines: { color: 'rgba(255, 255, 255, 0.05)' } },
+      layout: { background: { type: 'solid', color: '#121826' }, textColor: '#9ca3af' },
+      grid: { vertLines: { color: 'rgba(255, 255, 255, 0.03)' }, horzLines: { color: 'rgba(255, 255, 255, 0.03)' } },
       timeScale: { visible: false }
     });
 
@@ -180,8 +137,7 @@
         document.getElementById('current-price').innerText = `$${candle.close.toFixed(2)}`;
         document.getElementById('ticker-btc').innerText = `$${candle.close.toFixed(2)}`;
 
-        // Simulated RSI point
-        const mockRsi = 40 + Math.random() * 30;
+        const mockRsi = 45 + Math.random() * 20;
         rsiSeries.update({ time: candle.time, value: mockRsi });
       }
     };
@@ -199,13 +155,10 @@
     }
 
     setInterval(() => {
-      const randomSignal = Math.random();
-      if (randomSignal > 0.8) {
-        logTerminal('BUY Signal confirmed (RSI < 35 & Fast EMA Crossover)', 'buy');
-      } else if (randomSignal < 0.2) {
-        logTerminal('SELL Signal confirmed (RSI > 65)', 'sell');
+      if (Math.random() > 0.7) {
+        logTerminal('Athena monitoring trend: Market conditions stable.', 'info');
       }
-    }, 12000);
+    }, 15000);
   </script>
 </body>
 </html>
